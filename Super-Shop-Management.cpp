@@ -158,6 +158,12 @@ class Billing {
 public:
     ShoppingCart* cart; // Pointer to a ShoppingCart object
 
+    Billing(ShoppingCart* cart = nullptr) : cart(cart) {
+        if (cart == nullptr) {
+            std::cerr << "Warning: Billing object created without a ShoppingCart pointer." << std::endl;
+        }
+    }
+
     // Apply a discount to the total bill amount (placeholder for different discount types)
     void applyDiscount(float discount) {
         if (discount > 0.0f && discount <= 1.0f) { // Validate discount percentage
@@ -186,7 +192,102 @@ public:
 };
 
 
-// Main function to drive the program
 int main() {
+    // Create some initial products (replace with actual data storage)
+    Product apple(1, "Apples", 2.50, 10);
+    Product bread(2, "Bread", 3.00, 5);
+
+    // Create a shopping cart and billing object
+    ShoppingCart cart;
+    Billing bill(&cart); // Pass the cart address to Billing
+
+    int choice;
+    do {
+        std::cout << "\n** Supermarket Management System **" << std::endl;
+        std::cout << "1. Add Product to Cart" << std::endl;
+        std::cout << "2. Remove Product from Cart" << std::endl;
+        std::cout << "3. Update Product Quantity" << std::endl;
+        std::cout << "4. View Cart" << std::endl;
+        std::cout << "5. Apply Discount (optional)" << std::endl;
+        std::cout << "6. Checkout" << std::endl;
+        std::cout << "7. Exit" << std::endl;
+        std::cout << "Enter your choice: ";
+        std::cin >> choice;
+
+        switch (choice) {
+            case 1: {
+                int productID, quantity;
+                std::cout << "Enter product ID: ";
+                std::cin >> productID;
+                if (productID == apple.id || productID == bread.id) {
+                    std::cout << "Enter quantity: ";
+                    std::cin >> quantity;
+                    if (productID == apple.id) {
+                        cart.addItem(&apple, quantity);
+                    } else {
+                        cart.addItem(&bread, quantity);
+                    }
+                } else {
+                    std::cout << "Invalid product ID." << std::endl;
+                }
+                break;
+            }
+            case 2: {
+                int productID;
+                std::cout << "Enter product ID to remove: ";
+                std::cin >> productID;
+                if (productID == apple.id || productID == bread.id) {
+                    if (productID == apple.id) {
+                        cart.removeItem(&apple);
+                    } else {
+                        cart.removeItem(&bread);
+                    }
+                } else {
+                    std::cout << "Invalid product ID." << std::endl;
+                }
+                break;
+            }
+            case 3: {
+                int productID, quantity;
+                std::cout << "Enter product ID to update quantity: ";
+                std::cin >> productID;
+                if (productID == apple.id || productID == bread.id) {
+                    std::cout << "Enter new quantity: ";
+                    std::cin >> quantity;
+                    if (productID == apple.id) {
+                        cart.updateItemQuantity(&apple, quantity);
+                    } else {
+                        cart.updateItemQuantity(&bread, quantity);
+                    }
+                } else {
+                    std::cout << "Invalid product ID." << std::endl;
+                }
+                break;
+            }
+            case 4:
+                cart.displayCart();
+                break;
+            case 5: {
+                float discount;
+                std::cout << "Enter discount percentage (0.0 to 1.0): ";
+                std::cin >> discount;
+                bill.applyDiscount(discount);
+                break;
+            }
+            case 6: {
+                float finalBill = bill.calculateFinalBill();
+                std::cout << "** Final Bill **" << std::endl;
+                std::cout << "Total Cost: $" << finalBill << std::endl;
+                bill.simulatePayment();
+                break;
+            }
+            case 7:
+                std::cout << "Exiting program." << std::endl;
+                break;
+            default:
+                std::cout << "Invalid choice." << std::endl;
+        }
+    } while (choice != 7);
+
     return 0;
 }
